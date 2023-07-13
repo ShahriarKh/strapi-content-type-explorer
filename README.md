@@ -1,0 +1,1 @@
+# strapi-content-type-explorer
