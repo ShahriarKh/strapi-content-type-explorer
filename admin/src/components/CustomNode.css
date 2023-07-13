@@ -1,0 +1,35 @@
+.cte-plugin-box {
+  position: relative;
+  min-width: 280px;
+}
+
+.cte-plugin-header {
+  user-select: text;
+  cursor: auto;
+}
+
+.cte-plugin-line {
+  margin-right: auto;
+  padding-right: 12px; /*minimum gap*/
+  margin-top: -2px;
+  user-select: text;
+  cursor: auto;
+}
+
+.cte-plugin-handle {
+  position: absolute;
+  right: -27px;
+  top: 6px;
+  bottom: 0;
+  margin: auto;
+  visibility: hidden;
+  position: absolute;
+  padding: 0;
+}
+
+.cte-plugin-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  position: relative;
+}
