@@ -1,0 +1,12 @@
+.cte-plugin-controls button {
+  background-color: var(--button-background);
+  border: none;
+}
+
+.cte-plugin-controls button:hover {
+  background-color: var(--button-hover);
+}
+
+.cte-plugin-controls button svg {
+  fill: var(--button-foreground);
+}
