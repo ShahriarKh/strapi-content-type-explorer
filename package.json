@@ -1,6 +1,6 @@
 {
   "name": "strapi-content-type-explorer",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A Strapi plugin to view your content types and their relationships",
   "strapi": {
     "name": "content-type-explorer",
