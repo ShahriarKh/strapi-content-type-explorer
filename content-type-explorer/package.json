@@ -1,18 +1,24 @@
 {
   "name": "content-type-explorer",
   "version": "0.0.0",
-  "description": "This is the description of the plugin.",
+  "description": "A Strapi plugin to view your content types and their relationships",
   "strapi": {
     "name": "content-type-explorer",
-    "description": "Description of Content Type Explorer plugin",
+    "description": "A Strapi plugin to view your content types and their relationships",
     "kind": "plugin",
     "displayName": "Content Type Explorer"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shahriarkh/strapi-content-type-explorer.git"
   },
   "dependencies": {
     "@strapi/design-system": "^1.6.3",
     "@strapi/helper-plugin": "^4.6.0",
     "@strapi/icons": "^1.6.3",
-    "prop-types": "^15.7.2"
+    "prop-types": "^15.7.2",
+    "reactflow": "^11.7.4",
+    "@tisoap/react-flow-smart-edge": "^3.0.0"
   },
   "devDependencies": {
     "react": "^18.2.0",
@@ -27,11 +33,11 @@
     "styled-components": "^5.3.6"
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "Shahriar Khalvati"
   },
   "maintainers": [
     {
-      "name": "A Strapi developer"
+      "name": "Shahriar Khalvati"
     }
   ],
   "engines": {
