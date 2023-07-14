@@ -5,16 +5,10 @@
  */
 
 import React from "react";
-import {
-  Badge,
-  Box,
-  Divider,
-  Tooltip,
-  Typography,
-} from "@strapi/design-system";
+import { Badge, Box, Divider, Tooltip, Typography } from "@strapi/design-system";
 import { useTheme } from "styled-components";
 import { Handle } from "reactflow";
-import { RelationIndicator } from "./RelationIndicator";
+import { RelationIcon } from "./RelationIcon";
 import { getIcon } from "../utils/themeUtils";
 import "./CustomNode.css";
 
@@ -40,28 +34,13 @@ export default function CustomNode({ data }) {
 
   const theme = useTheme();
   return (
-    <Box
-      background="neutral0"
-      shadow="tableShadow"
-      hasRadius
-      padding="16px 24px"
-      className="cte-plugin-box"
-    >
-      <Typography
-        fontWeight="bold"
-        textColor="buttonPrimary500"
-        padding="16px"
-        className="cte-plugin-header nodrag"
-      >
+    <Box background="neutral0" shadow="tableShadow" hasRadius padding="16px 24px" className="cte-plugin-box">
+      <Typography fontWeight="bold" textColor="buttonPrimary500" padding="16px" className="cte-plugin-header nodrag">
         {data.info.displayName}
       </Typography>
 
       <br />
-      <Typography
-        textColor="neutral400"
-        padding="16px"
-        className="cte-plugin-header nodrag"
-      >
+      <Typography textColor="neutral400" padding="16px" className="cte-plugin-header nodrag">
         {data.key}
         <Handle
           type="target"
@@ -82,11 +61,7 @@ export default function CustomNode({ data }) {
               <p className="cte-plugin-line nodrag">{attr[0]}</p>
 
               {data.options.showTypes && (
-                <Badge
-                  size="M"
-                  backgroundColor="neutral0"
-                  textColor="neutral400"
-                >
+                <Badge size="M" backgroundColor="neutral0" textColor="neutral400">
                   {attr[1].type}
                 </Badge>
               )}
@@ -95,16 +70,9 @@ export default function CustomNode({ data }) {
               {attr[1].type === "relation" && (
                 <>
                   <Tooltip description={attr[1].relation}>
-                    <RelationIndicator theme={theme}>
-                      {getIcon(attr[1].relation)}
-                    </RelationIndicator>
+                    <RelationIcon theme={theme}>{getIcon(attr[1].relation)}</RelationIcon>
                   </Tooltip>
-                  <Handle
-                    type="source"
-                    id={attr[0]}
-                    position="right"
-                    className="cte-plugin-handle"
-                  />
+                  <Handle type="source" id={attr[0]} position="right" className="cte-plugin-handle" />
                 </>
               )}
             </div>
