@@ -15,7 +15,7 @@ npm i strapi-content-type-explorer
 ## ⚙️ Options
 - Field Data Types
 - Field Icons
-- Default Fields: toggle `createdBy`, `createdAt`, `updatedAt`
+- Default Fields: toggle `createdBy`, `createdAt`, `updatedBy`, `updatedAt`
 - Relational Fields Only
 - `admin::` Types
 - `plugin::` Types
@@ -28,4 +28,8 @@ npm i strapi-content-type-explorer
 If you encounter lags while dragging boxes, try changing edge types. "Smart" edges cause performance issues (this should be fixed in future releases)
 
 ## 🚀 Collaboration
-Have a question or found a bug? Feel free to open an issue. Wanna contribute and improve the plugin? PRs are welcome!
+Have a question or found a bug? Feel free to [open an issue](https://github.com/ShahriarKh/strapi-content-type-explorer/issues). Wanna contribute and improve the plugin? PRs are welcome!  
+
+---
+npm: https://www.npmjs.com/package/strapi-content-type-explorer  
+GitHub repo: https://github.com/ShahriarKh/strapi-content-type-explorer
