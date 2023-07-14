@@ -13,11 +13,19 @@ npm i strapi-content-type-explorer
 ```
 
 ## ⚙️ Options
-- **Field Data Types**: 
-- **Field Icons**: 
-- **Default Fields**: `createdBy`, `createdAt`, `updatedAt`
-- **Relational Fields Only**
-- **admin:: Types**
-- **plugin:: Types**
-- **Edges**
-- **Snap to Grid**
+- Field Data Types
+- Field Icons
+- Default Fields: toggle `createdBy`, `createdAt`, `updatedAt`
+- Relational Fields Only
+- `admin::` Types
+- `plugin::` Types
+- Edges
+- Snap to Grid
+- Backgorund Pattern
+- Edge Type
+
+## 🧭 Tips
+If you encounter lags while dragging boxes, try changing edge types. "Smart" edges cause performance issues (this should be fixed in future releases)
+
+## 🚀 Collaboration
+Have a question or found a bug? Feel free to open an issue. Wanna contribute and improve the plugin? PRs are welcome!
