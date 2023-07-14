@@ -24,6 +24,13 @@ export function createNodes(contentTypes, options) {
   return newNodes;
 }
 
+export function updateNodes(nodes, options) {
+  return nodes.map((node) => ({
+    ...node,
+    data: { ...node.data, options: options },
+  }));
+}
+
 export function createEdegs(contentTypes, options) {
   let newEdges = [];
 
@@ -31,11 +38,7 @@ export function createEdegs(contentTypes, options) {
     Object.keys(contentType.attributes).map((attr) => {
       if (contentType.attributes[attr].type == "relation") {
         // only add edge if target node is not excluded (not hidden)
-        if (
-          contentTypes.some(
-            (node) => node.key === contentType.attributes[attr].target
-          )
-        ) {
+        if (contentTypes.some((node) => node.key === contentType.attributes[attr].target)) {
           newEdges = [
             ...newEdges,
             {
@@ -43,6 +46,7 @@ export function createEdegs(contentTypes, options) {
               source: contentType.key,
               target: contentType.attributes[attr].target,
               type: options.edgeType,
+              hidden: !options.showEdges,
               sourceHandle: attr,
             },
           ];
@@ -51,4 +55,12 @@ export function createEdegs(contentTypes, options) {
     });
   });
   return newEdges;
+}
+
+export function updateEdges(edges, options) {
+  return edges.map((edge) => ({
+    ...edge,
+    type: options.edgeType,
+    hidden: !options.showEdges,
+  }));
 }

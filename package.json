@@ -26,6 +26,11 @@
   "author": {
     "name": "Shahriar Khalvati"
   },
+  "keywords": [
+    "strapi",
+    "plugin",
+    "erd"
+  ],
   "maintainers": [
     {
       "name": "Shahriar Khalvati"

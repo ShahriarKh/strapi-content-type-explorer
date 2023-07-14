@@ -5,25 +5,14 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, HeaderLayout, Icon, LinkButton } from "@strapi/design-system";
+import { HeaderLayout, Icon, LinkButton } from "@strapi/design-system";
 import explorerRequests from "../../api/explorer-api";
 import { Question, Search, Drag } from "@strapi/icons";
 import { useTheme } from "styled-components";
-import {
-  SmartBezierEdge,
-  SmartStepEdge,
-  SmartStraightEdge,
-} from "@tisoap/react-flow-smart-edge";
+import { SmartBezierEdge, SmartStepEdge, SmartStraightEdge } from "@tisoap/react-flow-smart-edge";
 import CustomNode from "../../components/CustomNode";
-import { createEdegs, createNodes } from "../../utils/dataUtils";
-import {
-  Background,
-  ControlButton,
-  Controls,
-  ReactFlow,
-  useEdgesState,
-  useNodesState,
-} from "reactflow";
+import { createEdegs, createNodes, updateEdges, updateNodes } from "../../utils/dataUtils";
+import { Background, ControlButton, Controls, ReactFlow, useEdgesState, useNodesState } from "reactflow";
 import { getBackgroundColor } from "../../utils/themeUtils";
 import "reactflow/dist/style.css";
 import OptionsBar from "../../components/OptionsBar";
@@ -68,12 +57,9 @@ const HomePage = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
-  // Show/hide content types on options change
+  // get (and filter) content-types
   useEffect(() => {
     const fetchData = async () => {
       let allTypes = await explorerRequests.getContentTypes();
@@ -89,19 +75,25 @@ const HomePage = () => {
     fetchData();
   }, [options.showAdminTypes, options.showPluginTypes]);
 
-  // Create/update nodes & edges
+  // create nodes & edges
   useEffect(() => {
     if (contentTypes.length > 0) {
       let newNodes = createNodes(contentTypes, options);
       setNodes(newNodes);
-      if (options.showEdges) {
-        let newEdges = createEdegs(contentTypes, options);
-        setEdges(newEdges);
-      } else {
-        setEdges([]);
-      }
+      let newEdges = createEdegs(contentTypes, options);
+      setEdges(newEdges);
     }
-  }, [contentTypes, options]);
+  }, [contentTypes]);
+
+  useEffect(() => {
+    let newEdges = updateEdges(edges, options);
+    setEdges(newEdges);
+  }, [setEdges, options.edgeType, options.showEdges]);
+
+  useEffect(() => {
+    let newNodes = updateNodes(nodes, options);
+    setNodes(newNodes);
+  }, [setNodes, options.showTypes, options.showIcons, options.showRelationsOnly, options.showDefaultFields]);
 
   return (
     <>
@@ -152,14 +144,8 @@ const HomePage = () => {
               "--button-hover": theme.colors.buttonPrimary500,
             }}
           >
-            <ControlButton
-              onClick={() => toggleOption("scrollMode")}
-              title="Toggle Mouse Wheel Behavior (Zoom/Scroll)"
-            >
-              <Icon
-                color="neutral1000"
-                as={options.scrollMode ? Drag : Search}
-              />
+            <ControlButton onClick={() => toggleOption("scrollMode")} title="Toggle Mouse Wheel Behavior (Zoom/Scroll)">
+              <Icon color="neutral1000" as={options.scrollMode ? Drag : Search} />
             </ControlButton>
           </Controls>
           <Background
