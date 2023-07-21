@@ -21,7 +21,7 @@ npm i strapi-content-type-explorer
 - `plugin::` Types
 - Edges
 - Snap to Grid
-- Backgorund Pattern
+- Background Pattern
 - Edge Type
 
 ## 🧭 Tips
