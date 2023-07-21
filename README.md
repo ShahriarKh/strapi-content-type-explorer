@@ -1,4 +1,4 @@
-# 🗺 Contnet-Type Explorer
+# 🗺 Content-Type Explorer
 
 Content-Type Explorer is a Strapi plugin that visualizes your content types and their relationships like an ERD (Entity Relationship Diagram).
 
