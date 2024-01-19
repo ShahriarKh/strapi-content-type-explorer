@@ -1,10 +1,11 @@
 module.exports = [
   {
     method: "GET",
-    path: "/get-content-types",
-    handler: "explorerController.getContentTypes",
+    path: "/get-types",
+    handler: "explorerController.getTypes",
     config: {
       policies: [],
+      auth: false,
     },
   },
 ];

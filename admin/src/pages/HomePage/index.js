@@ -1,28 +1,39 @@
-/*
- *
- * HomePage
- *
- */
-
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useFetchClient } from "@strapi/helper-plugin";
 import { HeaderLayout, Icon, LinkButton } from "@strapi/design-system";
-import explorerRequests from "../../api/explorer-api";
+// import explorerRequests from "../../api/explorer-api";
 import { Question, Search, Drag } from "@strapi/icons";
 import { useTheme } from "styled-components";
-import { SmartBezierEdge, SmartStepEdge, SmartStraightEdge } from "@tisoap/react-flow-smart-edge";
+import {
+  SmartBezierEdge,
+  SmartStepEdge,
+  SmartStraightEdge,
+} from "@tisoap/react-flow-smart-edge";
 import CustomNode from "../../components/CustomNode";
-import { createEdegs, createNodes, updateEdges, updateNodes } from "../../utils/dataUtils";
-import { Background, ControlButton, Controls, ReactFlow, useEdgesState, useNodesState } from "reactflow";
+import {
+  createEdegs,
+  createNodes,
+  updateEdges,
+  updateNodes,
+} from "../../utils/dataUtils";
+import {
+  Background,
+  ControlButton,
+  Controls,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+} from "reactflow";
 import { getBackgroundColor } from "../../utils/themeUtils";
-import "reactflow/dist/style.css";
 import OptionsBar from "../../components/OptionsBar";
+
+import "reactflow/dist/style.css";
 import "./styles.css";
 
 const HomePage = () => {
   const theme = useTheme();
-
+  const { get } = useFetchClient();
   const [contentTypes, setContentTypes] = useState([]);
-
   const [options, setOptions] = useState({
     snapToGrid: false,
     showTypes: true,
@@ -57,19 +68,25 @@ const HomePage = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
 
   // get (and filter) content-types
   useEffect(() => {
     const fetchData = async () => {
-      let allTypes = await explorerRequests.getContentTypes();
-      if (!options.showAdminTypes) {
-        allTypes = allTypes.filter((x) => !x.name.startsWith("admin::"));
-      }
-      if (!options.showPluginTypes) {
-        allTypes = allTypes.filter((x) => !x.name.startsWith("plugin::"));
-      }
-      setContentTypes(allTypes);
+      const data = await get(`/strapi-content-type-explorer/get-types`);
+      // console.log("fetching data");
+      // let allTypes = await explorerRequests.getContentTypes();
+      console.log("Data is", data);
+      // if (!options.showAdminTypes) {
+      //   allTypes = allTypes.filter((x) => !x.name.startsWith("admin::"));
+      // }
+      // if (!options.showPluginTypes) {
+      //   allTypes = allTypes.filter((x) => !x.name.startsWith("plugin::"));
+      // }
+      // setContentTypes(allTypes);
     };
 
     fetchData();
@@ -93,7 +110,13 @@ const HomePage = () => {
   useEffect(() => {
     let newNodes = updateNodes(nodes, options);
     setNodes(newNodes);
-  }, [setNodes, options.showTypes, options.showIcons, options.showRelationsOnly, options.showDefaultFields]);
+  }, [
+    setNodes,
+    options.showTypes,
+    options.showIcons,
+    options.showRelationsOnly,
+    options.showDefaultFields,
+  ]);
 
   return (
     <>
@@ -110,7 +133,10 @@ const HomePage = () => {
           </LinkButton>
         }
       />
-      <OptionsBar options={options} toggleOption={toggleOption} />
+      xxxxxxx
+      {/* <OptionsBar options={options} toggleOption={toggleOption} /> */}
+      nodes: are{JSON.stringify(nodes)}
+      content types: {JSON.stringify(contentTypes)}
       <div
         style={{
           height: "100vh",
@@ -144,8 +170,14 @@ const HomePage = () => {
               "--button-hover": theme.colors.buttonPrimary500,
             }}
           >
-            <ControlButton onClick={() => toggleOption("scrollMode")} title="Toggle Mouse Wheel Behavior (Zoom/Scroll)">
-              <Icon color="neutral1000" as={options.scrollMode ? Drag : Search} />
+            <ControlButton
+              onClick={() => toggleOption("scrollMode")}
+              title="Toggle Mouse Wheel Behavior (Zoom/Scroll)"
+            >
+              <Icon
+                color="neutral1000"
+                as={options.scrollMode ? Drag : Search}
+              />
             </ControlButton>
           </Controls>
           <Background
