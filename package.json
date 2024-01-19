@@ -13,12 +13,8 @@
     "url": "https://github.com/shahriarkh/strapi-content-type-explorer.git"
   },
   "dependencies": {
-    "@strapi/design-system": "^1.6.3",
-    "@strapi/helper-plugin": "^4.6.0",
-    "@strapi/icons": "^1.6.3",
-    "prop-types": "^15.7.2",
-    "reactflow": "^11.7.4",
-    "@tisoap/react-flow-smart-edge": "^3.0.0"
+    "@tisoap/react-flow-smart-edge": "^3.0.0",
+    "reactflow": "^11.10.2"
   },
   "peerDependencies": {
     "@strapi/strapi": "^4.0.0"
