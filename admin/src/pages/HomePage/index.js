@@ -1,48 +1,49 @@
-/*
- *
- * HomePage
- *
- */
-
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { HeaderLayout, Icon, LinkButton } from "@strapi/design-system";
-import explorerRequests from "../../api/explorer-api";
-import { Question, Search, Drag } from "@strapi/icons";
-import { useTheme } from "styled-components";
-import { SmartBezierEdge, SmartStepEdge, SmartStraightEdge } from "@tisoap/react-flow-smart-edge";
-import CustomNode from "../../components/CustomNode";
-import { createEdegs, createNodes, updateEdges, updateNodes } from "../../utils/dataUtils";
-import { Background, ControlButton, Controls, ReactFlow, useEdgesState, useNodesState } from "reactflow";
-import { getBackgroundColor } from "../../utils/themeUtils";
 import "reactflow/dist/style.css";
-import OptionsBar from "../../components/OptionsBar";
 import "./styles.css";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useFetchClient } from "@strapi/helper-plugin";
+import { HeaderLayout, Icon, Button } from "@strapi/design-system";
+import { Search, Drag, Download, Refresh } from "@strapi/icons";
+import { useTheme } from "styled-components";
+import {
+  SmartBezierEdge,
+  SmartStepEdge,
+  SmartStraightEdge,
+} from "@tisoap/react-flow-smart-edge";
+import { Background, ControlButton, Controls, ReactFlow } from "reactflow";
+import { getBackgroundColor } from "../../utils/themeUtils";
+import { useDigramStore } from "../../store";
+import { CustomNode } from "../../components/CustomNode";
+import { OptionsBar } from "../../components/OptionsBar";
+import { ExportModal } from "../../components/ExportModal";
+
+const useEffectSkipInitial = (func, deps) => {
+  const didMount = useRef(false);
+
+  useEffect(() => {
+    if (didMount.current) func();
+    else didMount.current = true;
+  }, deps);
+};
 
 const HomePage = () => {
   const theme = useTheme();
-
-  const [contentTypes, setContentTypes] = useState([]);
-
-  const [options, setOptions] = useState({
-    snapToGrid: false,
-    showTypes: true,
-    showIcons: true,
-    showRelationsOnly: false,
-    showAdminTypes: false,
-    showDefaultFields: false,
-    showPluginTypes: false,
-    showEdges: false,
-    scrollMode: true,
-    edgeType: "smartbezier",
-    backgroundPattern: "dots",
-  });
-
-  function toggleOption(optionName, optionValue = null) {
-    setOptions({
-      ...options,
-      [optionName]: optionValue || !options[optionName],
-    });
-  }
+  const { get } = useFetchClient();
+  const {
+    nodes,
+    redrawEdges,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    redrawNodes,
+    drawDiagram,
+    toggleOption,
+    options,
+    setData,
+    showModal,
+    setShowModal,
+  } = useDigramStore();
 
   const nodeTypes = useMemo(() => ({ special: CustomNode }), []);
   const edgeTypes = useMemo(
@@ -54,66 +55,59 @@ const HomePage = () => {
     []
   );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const regenrate = async () => {
+    const { data } = await get(`/strapi-content-type-explorer/get-types`);
+    setData(data);
+    drawDiagram();
+  };
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
-
-  // get (and filter) content-types
-  useEffect(() => {
-    const fetchData = async () => {
-      let allTypes = await explorerRequests.getContentTypes();
-      if (!options.showAdminTypes) {
-        allTypes = allTypes.filter((x) => !x.name.startsWith("admin::"));
-      }
-      if (!options.showPluginTypes) {
-        allTypes = allTypes.filter((x) => !x.name.startsWith("plugin::"));
-      }
-      setContentTypes(allTypes);
-    };
-
-    fetchData();
+  useEffectSkipInitial(() => {
+    regenrate();
   }, [options.showAdminTypes, options.showPluginTypes]);
 
-  // create nodes & edges
   useEffect(() => {
-    if (contentTypes.length > 0) {
-      let newNodes = createNodes(contentTypes, options);
-      setNodes(newNodes);
-      let newEdges = createEdegs(contentTypes, options);
-      setEdges(newEdges);
-    }
-  }, [contentTypes]);
+    redrawEdges();
+  }, [options.edgeType, options.showEdges]);
 
   useEffect(() => {
-    let newEdges = updateEdges(edges, options);
-    setEdges(newEdges);
-  }, [setEdges, options.edgeType, options.showEdges]);
+    redrawNodes();
+  }, [
+    options.showTypes,
+    options.showIcons,
+    options.showRelationsOnly,
+    options.showDefaultFields,
+  ]);
 
-  useEffect(() => {
-    let newNodes = updateNodes(nodes, options);
-    setNodes(newNodes);
-  }, [setNodes, options.showTypes, options.showIcons, options.showRelationsOnly, options.showDefaultFields]);
+  const ref = useRef(null);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <HeaderLayout
         title="Content-Type Explorer"
-        // primaryAction={<Button>Download as Image</Button>}
-        secondaryAction={
-          <LinkButton
-            variant="secondary"
-            startIcon={<Question />}
-            href="https://github.com/shahriarkh/strapi-content-type-explorer"
+        primaryAction={
+          <Button
+            variant="primary"
+            startIcon={<Download />}
+            onClick={() => setShowModal(true)}
           >
-            Help
-          </LinkButton>
+            Export Diagram
+          </Button>
+        }
+        secondaryAction={
+          <Button
+            variant="secondary"
+            startIcon={<Refresh />}
+            onClick={regenrate}
+          >
+            Regenrate
+          </Button>
         }
       />
-      <OptionsBar options={options} toggleOption={toggleOption} />
+      <OptionsBar />
       <div
+        ref={ref}
         style={{
-          height: "100vh",
+          height: "100%",
           borderTop: `1px solid ${theme.colors.neutral150}`,
         }}
       >
@@ -144,8 +138,14 @@ const HomePage = () => {
               "--button-hover": theme.colors.buttonPrimary500,
             }}
           >
-            <ControlButton onClick={() => toggleOption("scrollMode")} title="Toggle Mouse Wheel Behavior (Zoom/Scroll)">
-              <Icon color="neutral1000" as={options.scrollMode ? Drag : Search} />
+            <ControlButton
+              onClick={() => toggleOption("scrollMode")}
+              title="Toggle Mouse Wheel Behavior (Zoom/Scroll)"
+            >
+              <Icon
+                color="neutral1000"
+                as={options.scrollMode ? Drag : Search}
+              />
             </ControlButton>
           </Controls>
           <Background
@@ -153,8 +153,9 @@ const HomePage = () => {
             color={getBackgroundColor(options.backgroundPattern, theme)}
           />
         </ReactFlow>
+        {showModal && <ExportModal imageRef={ref} />}
       </div>
-    </>
+    </div>
   );
 };
 

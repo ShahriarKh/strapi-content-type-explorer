@@ -4,14 +4,16 @@ import {
   SingleSelectOption,
 } from "@strapi/design-system";
 import React from "react";
+import { useDigramStore } from "../store";
 
-export default function OptionsBar({ options, toggleOption }) {
+export function OptionsBar() {
+  const { options, toggleOption } = useDigramStore();
   return (
     <div
       style={{
         display: "flex",
         justifyContent: "flex-start",
-        alignItems: "center",
+        alignItems: "flex-start",
         padding: "0 56px 24px",
         gap: "24px",
       }}
@@ -23,14 +25,14 @@ export default function OptionsBar({ options, toggleOption }) {
         }}
         value={options.showTypes}
       >
-        Fields Data Types
+        Data Types
       </Checkbox>
       <Checkbox
         name="show-icons"
         onValueChange={() => toggleOption("showIcons")}
         value={options.showIcons}
       >
-        Fields Icons
+        Data Type Icons
       </Checkbox>
       <Checkbox
         name="show-default-fields"
