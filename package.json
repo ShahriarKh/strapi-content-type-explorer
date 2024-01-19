@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@tisoap/react-flow-smart-edge": "^3.0.0",
-    "reactflow": "^11.10.2"
+    "reactflow": "^11.10.2",
+    "zustand": "^4.4.7"
   },
   "peerDependencies": {
     "@strapi/strapi": "^4.0.0"

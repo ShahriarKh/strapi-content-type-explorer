@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useFetchClient, usePersistentState } from "@strapi/helper-plugin";
+import React, { useEffect, useMemo, useState } from "react";
+import { useFetchClient } from "@strapi/helper-plugin";
 import { HeaderLayout, Icon, LinkButton } from "@strapi/design-system";
 import { Question, Search, Drag } from "@strapi/icons";
 import { useTheme } from "styled-components";
@@ -10,53 +10,37 @@ import {
 } from "@tisoap/react-flow-smart-edge";
 import CustomNode from "../../components/CustomNode";
 import {
-  createEdegs,
-  createNodes,
-  updateEdges,
-  updateNodes,
-} from "../../utils/dataUtils";
-import {
   Background,
   ControlButton,
   Controls,
   ReactFlow,
-  useEdgesState,
-  useNodesState,
+  useReactFlow,
 } from "reactflow";
 import { getBackgroundColor } from "../../utils/themeUtils";
 import OptionsBar from "../../components/OptionsBar";
-
 import "reactflow/dist/style.css";
 import "./styles.css";
+import { useDigramStore } from "../../store";
+// import { shallow } from "zustand/shallow";
 
 const HomePage = () => {
   const theme = useTheme();
   const { get } = useFetchClient();
-  const [contentTypesData, setContentTypesData] = useState([]);
+  // const { setViewport } = useReactFlow();
+  const [diagram, setDiagram] = useState(null);
 
-  const [options, setOptions] = usePersistentState(
-    "content-type-explorer-options",
-    {
-      snapToGrid: false,
-      showTypes: true,
-      showIcons: true,
-      showRelationsOnly: false,
-      showAdminTypes: false,
-      showDefaultFields: false,
-      showPluginTypes: false,
-      showEdges: false,
-      scrollMode: true,
-      edgeType: "smartbezier",
-      backgroundPattern: "dots",
-    }
-  );
-
-  function toggleOption(optionName, optionValue = null) {
-    setOptions({
-      ...options,
-      [optionName]: optionValue || !options[optionName],
-    });
-  }
+  const {
+    nodes,
+    redrawEdges,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    redrawNodes,
+    drawDiagram,
+    toggleOption,
+    options,
+  } = useDigramStore();
 
   const nodeTypes = useMemo(() => ({ special: CustomNode }), []);
   const edgeTypes = useMemo(
@@ -68,13 +52,32 @@ const HomePage = () => {
     []
   );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  // const saveDiagram = useCallback(() => {
+  //   if (diagram) {
+  //     const flow = diagram.toObject();
+  //     localStorage.setItem(
+  //       "content-type-explorer-diagram",
+  //       JSON.stringify(flow)
+  //     );
+  //   }
+  // }, [diagram]);
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  // const restoreDiagram = useCallback(() => {
+  //   const restoreFlow = async () => {
+  //     const flow = JSON.parse(
+  //       localStorage.getItem("content-type-explorer-diagram")
+  //     );
+
+  //     if (flow) {
+  //       const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+  //       setNodes(flow.nodes || []);
+  //       setEdges(flow.edges || []);
+  //       setViewport({ x, y, zoom });
+  //     }
+  //   };
+
+  //   restoreFlow();
+  // }, [setNodes, setViewport]);
 
   // get (and filter) content-types
   useEffect(() => {
@@ -87,32 +90,20 @@ const HomePage = () => {
       if (!options.showPluginTypes) {
         allTypes = allTypes.filter((x) => !x.name.startsWith("plugin::"));
       }
-      setContentTypesData(allTypes);
+
+      drawDiagram(allTypes);
     };
 
     fetchData();
   }, [options.showAdminTypes, options.showPluginTypes]);
 
-  // create nodes & edges
   useEffect(() => {
-    if (contentTypesData.length > 0) {
-      let newNodes = createNodes(contentTypesData, options);
-      setNodes(newNodes);
-      let newEdges = createEdegs(contentTypesData, options);
-      setEdges(newEdges);
-    }
-  }, [contentTypesData]);
+    redrawEdges();
+  }, [options.edgeType, options.showEdges]);
 
   useEffect(() => {
-    let newEdges = updateEdges(edges, options);
-    setEdges(newEdges);
-  }, [setEdges, options.edgeType, options.showEdges]);
-
-  useEffect(() => {
-    let newNodes = updateNodes(nodes, options);
-    setNodes(newNodes);
+    redrawNodes();
   }, [
-    setNodes,
     options.showTypes,
     options.showIcons,
     options.showRelationsOnly,
@@ -134,7 +125,7 @@ const HomePage = () => {
           </LinkButton>
         }
       />
-      <OptionsBar options={options} toggleOption={toggleOption} />
+      <OptionsBar />
       <div
         style={{
           height: "100%",
@@ -147,6 +138,7 @@ const HomePage = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onInit={setDiagram}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           fitView
@@ -168,6 +160,8 @@ const HomePage = () => {
               "--button-hover": theme.colors.buttonPrimary500,
             }}
           >
+            {/* <button onClick={saveDiagram}>save</button>
+            <button onClick={restoreDiagram}>restore</button>  */}
             <ControlButton
               onClick={() => toggleOption("scrollMode")}
               title="Toggle Mouse Wheel Behavior (Zoom/Scroll)"

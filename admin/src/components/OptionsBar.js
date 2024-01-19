@@ -4,8 +4,10 @@ import {
   SingleSelectOption,
 } from "@strapi/design-system";
 import React from "react";
+import { useDigramStore } from "../store";
 
-export default function OptionsBar({ options, toggleOption }) {
+export default function OptionsBar() {
+  const { options, toggleOption } = useDigramStore();
   return (
     <div
       style={{
