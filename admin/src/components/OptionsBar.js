@@ -6,7 +6,7 @@ import {
 import React from "react";
 import { useDigramStore } from "../store";
 
-export default function OptionsBar() {
+export function OptionsBar() {
   const { options, toggleOption } = useDigramStore();
   return (
     <div

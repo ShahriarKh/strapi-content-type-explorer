@@ -10,7 +10,9 @@ export function createNodes(contentTypes, options) {
           id: node.key,
           position: {
             x: (index % CARDS_PER_ROW) * 320,
-            y: ((index - (index % CARDS_PER_ROW)) / CARDS_PER_ROW) * 560,
+            y:
+              ((index - (index % CARDS_PER_ROW)) / CARDS_PER_ROW) * 560 +
+              (index % 2) * 48,
           },
           type: "special",
 
@@ -38,7 +40,11 @@ export function createEdegs(contentTypes, options) {
     Object.keys(contentType.attributes).map((attr) => {
       if (contentType.attributes[attr].type == "relation") {
         // only add edge if target node is not excluded (not hidden)
-        if (contentTypes.some((node) => node.key === contentType.attributes[attr].target)) {
+        if (
+          contentTypes.some(
+            (node) => node.key === contentType.attributes[attr].target
+          )
+        ) {
           newEdges = [
             ...newEdges,
             {

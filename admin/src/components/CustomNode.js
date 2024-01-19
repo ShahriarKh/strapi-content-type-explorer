@@ -18,7 +18,7 @@ import { RelationIcon } from "./RelationIcon";
 import { getIcon } from "../utils/themeUtils";
 import "./CustomNode.css";
 
-export default function CustomNode({ data }) {
+export function CustomNode({ data }) {
   let attributesToShow = Object.entries(data.attributes);
 
   if (data.options.showRelationsOnly) {

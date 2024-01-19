@@ -1,3 +1,5 @@
+import "reactflow/dist/style.css";
+import "./styles.css";
 import React, { useEffect, useMemo, useRef } from "react";
 import { useFetchClient } from "@strapi/helper-plugin";
 import { HeaderLayout, Icon, Button } from "@strapi/design-system";
@@ -8,13 +10,11 @@ import {
   SmartStepEdge,
   SmartStraightEdge,
 } from "@tisoap/react-flow-smart-edge";
-import CustomNode from "../../components/CustomNode";
 import { Background, ControlButton, Controls, ReactFlow } from "reactflow";
 import { getBackgroundColor } from "../../utils/themeUtils";
-import OptionsBar from "../../components/OptionsBar";
-import "reactflow/dist/style.css";
-import "./styles.css";
 import { useDigramStore } from "../../store";
+import { CustomNode } from "../../components/CustomNode";
+import { OptionsBar } from "../../components/OptionsBar";
 import { ExportModal } from "../../components/ExportModal";
 
 const useEffectSkipInitial = (func, deps) => {
@@ -86,7 +86,7 @@ const HomePage = () => {
         title="Content-Type Explorer"
         primaryAction={
           <Button
-            variant="secondary"
+            variant="primary"
             startIcon={<Download />}
             onClick={() => setShowModal(true)}
           >
@@ -94,7 +94,11 @@ const HomePage = () => {
           </Button>
         }
         secondaryAction={
-          <Button variant="primary" startIcon={<Refresh />} onClick={regenrate}>
+          <Button
+            variant="secondary"
+            startIcon={<Refresh />}
+            onClick={regenrate}
+          >
             Regenrate
           </Button>
         }
@@ -113,7 +117,6 @@ const HomePage = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          // onInit={fetchData}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           fitView
@@ -121,7 +124,6 @@ const HomePage = () => {
           preventScrolling={!options.scrollMode}
           snapGrid={[20, 20]}
           snapToGrid={options.snapToGrid}
-          // viewport={diagram.viewport}
           fitViewOptions={{
             maxZoom: 1,
           }}
