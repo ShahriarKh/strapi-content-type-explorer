@@ -11,6 +11,7 @@ import {
   Media,
   Boolean,
   Json,
+  Blocks,
   Relation,
   Uid,
   OneToMany,
@@ -67,6 +68,8 @@ export function getIcon(attrType) {
       return <RichText />;
     case "media":
       return <Media />;
+    case "blocks":
+      return <Blocks />;
 
     case "onetomany": //
       return <OneToMany />;
