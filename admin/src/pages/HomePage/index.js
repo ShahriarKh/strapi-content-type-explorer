@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useFetchClient } from "@strapi/helper-plugin";
-import { HeaderLayout, Icon, LinkButton } from "@strapi/design-system";
-import { Question, Search, Drag } from "@strapi/icons";
+import { HeaderLayout, Icon, Button } from "@strapi/design-system";
+import { Search, Drag, Download, Refresh } from "@strapi/icons";
 import { useTheme } from "styled-components";
 import {
   SmartBezierEdge,
@@ -9,26 +9,25 @@ import {
   SmartStraightEdge,
 } from "@tisoap/react-flow-smart-edge";
 import CustomNode from "../../components/CustomNode";
-import {
-  Background,
-  ControlButton,
-  Controls,
-  ReactFlow,
-  useReactFlow,
-} from "reactflow";
+import { Background, ControlButton, Controls, ReactFlow } from "reactflow";
 import { getBackgroundColor } from "../../utils/themeUtils";
 import OptionsBar from "../../components/OptionsBar";
 import "reactflow/dist/style.css";
 import "./styles.css";
 import { useDigramStore } from "../../store";
-// import { shallow } from "zustand/shallow";
+
+const useEffectSkipInitial = (func, deps) => {
+  const didMount = useRef(false);
+
+  useEffect(() => {
+    if (didMount.current) func();
+    else didMount.current = true;
+  }, deps);
+};
 
 const HomePage = () => {
   const theme = useTheme();
   const { get } = useFetchClient();
-  // const { setViewport } = useReactFlow();
-  const [diagram, setDiagram] = useState(null);
-
   const {
     nodes,
     redrawEdges,
@@ -40,6 +39,7 @@ const HomePage = () => {
     drawDiagram,
     toggleOption,
     options,
+    setData,
   } = useDigramStore();
 
   const nodeTypes = useMemo(() => ({ special: CustomNode }), []);
@@ -52,49 +52,14 @@ const HomePage = () => {
     []
   );
 
-  // const saveDiagram = useCallback(() => {
-  //   if (diagram) {
-  //     const flow = diagram.toObject();
-  //     localStorage.setItem(
-  //       "content-type-explorer-diagram",
-  //       JSON.stringify(flow)
-  //     );
-  //   }
-  // }, [diagram]);
+  const refresh = async () => {
+    const { data } = await get(`/strapi-content-type-explorer/get-types`);
+    setData(data);
+    drawDiagram();
+  };
 
-  // const restoreDiagram = useCallback(() => {
-  //   const restoreFlow = async () => {
-  //     const flow = JSON.parse(
-  //       localStorage.getItem("content-type-explorer-diagram")
-  //     );
-
-  //     if (flow) {
-  //       const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-  //       setNodes(flow.nodes || []);
-  //       setEdges(flow.edges || []);
-  //       setViewport({ x, y, zoom });
-  //     }
-  //   };
-
-  //   restoreFlow();
-  // }, [setNodes, setViewport]);
-
-  // get (and filter) content-types
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await get(`/strapi-content-type-explorer/get-types`);
-      let allTypes = data;
-      if (!options.showAdminTypes) {
-        allTypes = allTypes.filter((x) => !x.name.startsWith("admin::"));
-      }
-      if (!options.showPluginTypes) {
-        allTypes = allTypes.filter((x) => !x.name.startsWith("plugin::"));
-      }
-
-      drawDiagram(allTypes);
-    };
-
-    fetchData();
+  useEffectSkipInitial(() => {
+    refresh();
   }, [options.showAdminTypes, options.showPluginTypes]);
 
   useEffect(() => {
@@ -114,15 +79,15 @@ const HomePage = () => {
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <HeaderLayout
         title="Content-Type Explorer"
-        // primaryAction={<Button>Download as Image</Button>}
+        primaryAction={
+          <Button variant="secondary" startIcon={<Download />}>
+            Export Diagram
+          </Button>
+        }
         secondaryAction={
-          <LinkButton
-            variant="secondary"
-            startIcon={<Question />}
-            href="https://github.com/shahriarkh/strapi-content-type-explorer"
-          >
-            Help
-          </LinkButton>
+          <Button variant="primary" startIcon={<Refresh />} onClick={refresh}>
+            Draw Again
+          </Button>
         }
       />
       <OptionsBar />
@@ -138,7 +103,7 @@ const HomePage = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          onInit={setDiagram}
+          // onInit={fetchData}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           fitView
@@ -146,6 +111,7 @@ const HomePage = () => {
           preventScrolling={!options.scrollMode}
           snapGrid={[20, 20]}
           snapToGrid={options.snapToGrid}
+          // viewport={diagram.viewport}
           fitViewOptions={{
             maxZoom: 1,
           }}
@@ -160,8 +126,6 @@ const HomePage = () => {
               "--button-hover": theme.colors.buttonPrimary500,
             }}
           >
-            {/* <button onClick={saveDiagram}>save</button>
-            <button onClick={restoreDiagram}>restore</button>  */}
             <ControlButton
               onClick={() => toggleOption("scrollMode")}
               title="Toggle Mouse Wheel Behavior (Zoom/Scroll)"
