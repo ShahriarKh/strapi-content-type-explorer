@@ -15,6 +15,7 @@ import OptionsBar from "../../components/OptionsBar";
 import "reactflow/dist/style.css";
 import "./styles.css";
 import { useDigramStore } from "../../store";
+import { ExportModal } from "../../components/ExportModal";
 
 const useEffectSkipInitial = (func, deps) => {
   const didMount = useRef(false);
@@ -40,6 +41,8 @@ const HomePage = () => {
     toggleOption,
     options,
     setData,
+    showModal,
+    setShowModal,
   } = useDigramStore();
 
   const nodeTypes = useMemo(() => ({ special: CustomNode }), []);
@@ -52,14 +55,14 @@ const HomePage = () => {
     []
   );
 
-  const refresh = async () => {
+  const regenrate = async () => {
     const { data } = await get(`/strapi-content-type-explorer/get-types`);
     setData(data);
     drawDiagram();
   };
 
   useEffectSkipInitial(() => {
-    refresh();
+    regenrate();
   }, [options.showAdminTypes, options.showPluginTypes]);
 
   useEffect(() => {
@@ -75,23 +78,30 @@ const HomePage = () => {
     options.showDefaultFields,
   ]);
 
+  const ref = useRef(null);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <HeaderLayout
         title="Content-Type Explorer"
         primaryAction={
-          <Button variant="secondary" startIcon={<Download />}>
+          <Button
+            variant="secondary"
+            startIcon={<Download />}
+            onClick={() => setShowModal(true)}
+          >
             Export Diagram
           </Button>
         }
         secondaryAction={
-          <Button variant="primary" startIcon={<Refresh />} onClick={refresh}>
-            Draw Again
+          <Button variant="primary" startIcon={<Refresh />} onClick={regenrate}>
+            Regenrate
           </Button>
         }
       />
       <OptionsBar />
       <div
+        ref={ref}
         style={{
           height: "100%",
           borderTop: `1px solid ${theme.colors.neutral150}`,
@@ -141,6 +151,7 @@ const HomePage = () => {
             color={getBackgroundColor(options.backgroundPattern, theme)}
           />
         </ReactFlow>
+        {showModal && <ExportModal imageRef={ref} />}
       </div>
     </div>
   );

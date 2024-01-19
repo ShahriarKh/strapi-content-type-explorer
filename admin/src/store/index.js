@@ -14,6 +14,7 @@ export const useDigramStore = create(
       nodes: [],
       edges: [],
       data: [],
+      showModal: false,
       options: {
         snapToGrid: false,
         showTypes: true,
@@ -30,6 +31,11 @@ export const useDigramStore = create(
       setData: (contentTypesData) => {
         set({
           data: contentTypesData,
+        });
+      },
+      setShowModal: (bool) => {
+        set({
+          showModal: bool,
         });
       },
       toggleOption: (optionName, optionValue = null) => {
