@@ -13,7 +13,7 @@ export default function OptionsBar() {
       style={{
         display: "flex",
         justifyContent: "flex-start",
-        alignItems: "center",
+        alignItems: "flex-start",
         padding: "0 56px 24px",
         gap: "24px",
       }}
@@ -25,14 +25,14 @@ export default function OptionsBar() {
         }}
         value={options.showTypes}
       >
-        Fields Data Types
+        Data Types
       </Checkbox>
       <Checkbox
         name="show-icons"
         onValueChange={() => toggleOption("showIcons")}
         value={options.showIcons}
       >
-        Fields Icons
+        Data Type Icons
       </Checkbox>
       <Checkbox
         name="show-default-fields"
