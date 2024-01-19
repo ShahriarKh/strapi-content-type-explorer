@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useFetchClient } from "@strapi/helper-plugin";
+import { useFetchClient, usePersistentState } from "@strapi/helper-plugin";
 import { HeaderLayout, Icon, LinkButton } from "@strapi/design-system";
-// import explorerRequests from "../../api/explorer-api";
 import { Question, Search, Drag } from "@strapi/icons";
 import { useTheme } from "styled-components";
 import {
@@ -33,20 +32,24 @@ import "./styles.css";
 const HomePage = () => {
   const theme = useTheme();
   const { get } = useFetchClient();
-  const [contentTypes, setContentTypes] = useState([]);
-  const [options, setOptions] = useState({
-    snapToGrid: false,
-    showTypes: true,
-    showIcons: true,
-    showRelationsOnly: false,
-    showAdminTypes: false,
-    showDefaultFields: false,
-    showPluginTypes: false,
-    showEdges: false,
-    scrollMode: true,
-    edgeType: "smartbezier",
-    backgroundPattern: "dots",
-  });
+  const [contentTypesData, setContentTypesData] = useState([]);
+
+  const [options, setOptions] = usePersistentState(
+    "content-type-explorer-options",
+    {
+      snapToGrid: false,
+      showTypes: true,
+      showIcons: true,
+      showRelationsOnly: false,
+      showAdminTypes: false,
+      showDefaultFields: false,
+      showPluginTypes: false,
+      showEdges: false,
+      scrollMode: true,
+      edgeType: "smartbezier",
+      backgroundPattern: "dots",
+    }
+  );
 
   function toggleOption(optionName, optionValue = null) {
     setOptions({
@@ -76,17 +79,15 @@ const HomePage = () => {
   // get (and filter) content-types
   useEffect(() => {
     const fetchData = async () => {
-      const data = await get(`/strapi-content-type-explorer/get-types`);
-      // console.log("fetching data");
-      // let allTypes = await explorerRequests.getContentTypes();
-      console.log("Data is", data);
-      // if (!options.showAdminTypes) {
-      //   allTypes = allTypes.filter((x) => !x.name.startsWith("admin::"));
-      // }
-      // if (!options.showPluginTypes) {
-      //   allTypes = allTypes.filter((x) => !x.name.startsWith("plugin::"));
-      // }
-      // setContentTypes(allTypes);
+      const { data } = await get(`/strapi-content-type-explorer/get-types`);
+      let allTypes = data;
+      if (!options.showAdminTypes) {
+        allTypes = allTypes.filter((x) => !x.name.startsWith("admin::"));
+      }
+      if (!options.showPluginTypes) {
+        allTypes = allTypes.filter((x) => !x.name.startsWith("plugin::"));
+      }
+      setContentTypesData(allTypes);
     };
 
     fetchData();
@@ -94,13 +95,13 @@ const HomePage = () => {
 
   // create nodes & edges
   useEffect(() => {
-    if (contentTypes.length > 0) {
-      let newNodes = createNodes(contentTypes, options);
+    if (contentTypesData.length > 0) {
+      let newNodes = createNodes(contentTypesData, options);
       setNodes(newNodes);
-      let newEdges = createEdegs(contentTypes, options);
+      let newEdges = createEdegs(contentTypesData, options);
       setEdges(newEdges);
     }
-  }, [contentTypes]);
+  }, [contentTypesData]);
 
   useEffect(() => {
     let newEdges = updateEdges(edges, options);
@@ -119,7 +120,7 @@ const HomePage = () => {
   ]);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <HeaderLayout
         title="Content-Type Explorer"
         // primaryAction={<Button>Download as Image</Button>}
@@ -133,13 +134,10 @@ const HomePage = () => {
           </LinkButton>
         }
       />
-      xxxxxxx
-      {/* <OptionsBar options={options} toggleOption={toggleOption} /> */}
-      nodes: are{JSON.stringify(nodes)}
-      content types: {JSON.stringify(contentTypes)}
+      <OptionsBar options={options} toggleOption={toggleOption} />
       <div
         style={{
-          height: "100vh",
+          height: "100%",
           borderTop: `1px solid ${theme.colors.neutral150}`,
         }}
       >
@@ -186,7 +184,7 @@ const HomePage = () => {
           />
         </ReactFlow>
       </div>
-    </>
+    </div>
   );
 };
 
