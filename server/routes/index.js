@@ -5,7 +5,6 @@ module.exports = [
     handler: "explorerController.getTypes",
     config: {
       policies: [],
-      auth: false,
     },
   },
 ];
