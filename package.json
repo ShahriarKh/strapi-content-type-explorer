@@ -3,7 +3,7 @@
   "version": "0.2.1",
   "description": "A Strapi plugin to view your content types and their relationships",
   "strapi": {
-    "name": "content-type-explorer",
+    "name": "strapi-content-type-explorer",
     "description": "A Strapi plugin to view your content types and their relationships",
     "kind": "plugin",
     "displayName": "Content Type Explorer"
